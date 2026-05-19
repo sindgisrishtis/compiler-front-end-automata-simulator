@@ -314,6 +314,7 @@ int a = (10 + 5];
 # ═══════════════════════════════════════════════
 
 def page_compiler():
+
     st.markdown("""
     <h1>🚀 Compiler Front-End</h1>
     <p style="font-family:'Share Tech Mono',monospace;color:#64748b;font-size:0.8rem;">
@@ -323,101 +324,230 @@ def page_compiler():
 
     col_left, col_right = st.columns([3, 2], gap="large")
 
+    # ─────────────────────────────────────────────
+    # LEFT PANEL
+    # ─────────────────────────────────────────────
+
     with col_left:
-        st.markdown('<div class="toc-card-accent">', unsafe_allow_html=True)
+
         st.markdown("### 📝 Source Code Editor")
 
-        sample_key = st.selectbox("Load sample program:", ["(write your own)"] + list(SAMPLES.keys()))
-        if sample_key != "(write your own)":
-            default_code = SAMPLES[sample_key]
-        else:
-            default_code = st.session_state.source or "int a = 10;\n\nif(a > 5){\n    a = a + 1;\n}\n"
+        # Sample selector
+        sample_options = ["(write your own)"] + list(SAMPLES.keys())
 
+        selected_sample = st.selectbox(
+            "Load sample program:",
+            sample_options
+        )
+
+        # Load selected sample automatically
+        if selected_sample == "(write your own)":
+
+            default_code = st.session_state.get(
+                "source",
+                "int a = 10;\n\nif(a > 5){\n    a = a + 1;\n}"
+            )
+
+        else:
+            default_code = SAMPLES[selected_sample]
+
+        # Editor
         source = st.text_area(
-            "Source code input",
+            "",
             value=default_code,
             height=240,
-            label_visibility="collapsed",
-            key="code_input",
+            key=f"editor_{selected_sample}"
         )
-        st.markdown('</div>', unsafe_allow_html=True)
 
+        # Analyse button
         run_col, _ = st.columns([1, 3])
-        with run_col:
-            run = st.button("⚡ ANALYSE", use_container_width=True, type="primary")
 
+        with run_col:
+            run = st.button(
+                "⚡ ANALYSE",
+                use_container_width=True,
+                type="primary"
+            )
+
+        # Run simulator
         if run and source.strip():
+
             sim = Simulator()
+
             report = sim.run(source)
+
             st.session_state.report = report
             st.session_state.source = source
 
-    # ── Results ──────────────────────────────────────────
-    if st.session_state.report:
+    # ─────────────────────────────────────────────
+    # RESULTS
+    # ─────────────────────────────────────────────
+
+    if st.session_state.get("report"):
+
         r: SimulationReport = st.session_state.report
 
         with col_right:
+
             # Verdict
             if r.lexically_valid and r.syntactically_valid:
-                st.markdown('<div class="verdict-accept">✅ ACCEPTED — Lexically & Syntactically Valid</div>', unsafe_allow_html=True)
+
+                st.markdown(
+                    '''
+                    <div class="verdict-accept">
+                    ✅ ACCEPTED — Lexically & Syntactically Valid
+                    </div>
+                    ''',
+                    unsafe_allow_html=True
+                )
+
             else:
-                st.markdown('<div class="verdict-reject">❌ REJECTED — Errors Detected</div>', unsafe_allow_html=True)
 
-            st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown(
+                    '''
+                    <div class="verdict-reject">
+                    ❌ REJECTED — Errors Detected
+                    </div>
+                    ''',
+                    unsafe_allow_html=True
+                )
 
-            # Quick metrics
+            st.write("")
+
+            # Metrics
             c1, c2, c3 = st.columns(3)
+
             with c1:
-                st.markdown(f'<div class="metric-tile"><div class="metric-value">{len(r.tokens)}</div><div class="metric-label">Tokens</div></div>', unsafe_allow_html=True)
+                st.markdown(
+                    f'''
+                    <div class="metric-tile">
+                        <div class="metric-value">{len(r.tokens)}</div>
+                        <div class="metric-label">Tokens</div>
+                    </div>
+                    ''',
+                    unsafe_allow_html=True
+                )
+
             with c2:
+
                 err_count = len(r.parse_result.errors)
-                st.markdown(f'<div class="metric-tile"><div class="metric-value" style="color:{"#ef4444" if err_count else "#10b981"}">{err_count}</div><div class="metric-label">Errors</div></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                    f'''
+                    <div class="metric-tile">
+                        <div class="metric-value" style="color:{"#ef4444" if err_count else "#10b981"}">
+                            {err_count}
+                        </div>
+                        <div class="metric-label">Errors</div>
+                    </div>
+                    ''',
+                    unsafe_allow_html=True
+                )
+
             with c3:
-                st.markdown(f'<div class="metric-tile"><div class="metric-value">{r.parse_result.statements_found}</div><div class="metric-label">Stmts</div></div>', unsafe_allow_html=True)
 
-            st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown(
+                    f'''
+                    <div class="metric-tile">
+                        <div class="metric-value">{r.parse_result.statements_found}</div>
+                        <div class="metric-label">Statements</div>
+                    </div>
+                    ''',
+                    unsafe_allow_html=True
+                )
 
-            # Errors & Warnings
+            st.write("")
+
+            # Errors
             if r.parse_result.errors:
-                st.markdown("**🔴 Syntax Errors**")
+
+                st.markdown("### 🔴 Syntax Errors")
+
                 for e in r.parse_result.errors:
-                    st.markdown(f'<div style="background:rgba(239,68,68,0.1);border-left:3px solid #ef4444;padding:8px 12px;margin:4px 0;border-radius:0 4px 4px 0;font-family:Share Tech Mono,monospace;font-size:12px;color:#fca5a5;">Line {e.line}: {e.message}</div>', unsafe_allow_html=True)
 
-            if r.parse_result.warnings:
-                st.markdown("**🟡 Warnings**")
-                for w in r.parse_result.warnings:
-                    st.markdown(f'<div style="background:rgba(251,191,36,0.1);border-left:3px solid #fbbf24;padding:8px 12px;margin:4px 0;border-radius:0 4px 4px 0;font-family:Share Tech Mono,monospace;font-size:12px;color:#fde68a;">Line {w.line}: {w.message}</div>', unsafe_allow_html=True)
+                    st.markdown(
+                        f'''
+                        <div style="
+                            background:rgba(239,68,68,0.1);
+                            border-left:3px solid #ef4444;
+                            padding:8px 12px;
+                            margin:4px 0;
+                            border-radius:0 4px 4px 0;
+                            font-family:Share Tech Mono,monospace;
+                            font-size:12px;
+                            color:#fca5a5;
+                        ">
+                        Line {e.line}: {e.message}
+                        </div>
+                        ''',
+                        unsafe_allow_html=True
+                    )
 
-        # ── Bottom panels ─────────────────────────────────
-        st.markdown("<br>", unsafe_allow_html=True)
-        tab1, tab2, tab3 = st.tabs(["🎨 Highlighted Source", "🏷 Token Stream", "📊 Token Statistics"])
+        # ─────────────────────────────────────────────
+        # BOTTOM PANELS
+        # ─────────────────────────────────────────────
 
+        st.write("")
+
+        tab1, tab2 = st.tabs([
+            "🏷 Token Stream",
+            "📊 Token Statistics"
+        ])
+
+        # TOKEN STREAM
         with tab1:
-            st.markdown(highlight_source(r.source, r.tokens), unsafe_allow_html=True)
 
-        with tab2:
             badge_html = ""
+
             for tok in r.tokens:
                 badge_html += token_badge(tok.type, tok.value) + " "
-            st.markdown(f'<div style="line-height:2.2;">{badge_html}</div>', unsafe_allow_html=True)
 
-            # Token table
+            st.markdown(
+                f'<div style="line-height:2.2;">{badge_html}</div>',
+                unsafe_allow_html=True
+            )
+
             df = pd.DataFrame([
-                {"#": i+1, "Type": t.type, "Value": t.value, "Line": t.line, "Column": t.column}
+                {
+                    "#": i + 1,
+                    "Type": t.type,
+                    "Value": t.value,
+                    "Line": t.line,
+                    "Column": t.column
+                }
                 for i, t in enumerate(r.tokens)
             ])
-            st.dataframe(df, use_container_width=True, height=300, hide_index=True)
 
-        with tab3:
+            st.dataframe(
+                df,
+                use_container_width=True,
+                height=300,
+                hide_index=True
+            )
+
+        # TOKEN STATISTICS
+        with tab2:
+
             stats = r.token_stats
-            if stats:
-                df_stats = pd.DataFrame(
-                    [{"Token Type": k, "Count": v, "Percentage": f"{100*v/max(sum(stats.values()),1):.1f}%"}
-                     for k, v in sorted(stats.items(), key=lambda x: -x[1])]
-                )
-                st.dataframe(df_stats, use_container_width=True, hide_index=True)
-                st.bar_chart(pd.Series(stats))
 
+            if stats:
+
+                df_stats = pd.DataFrame([
+                    {
+                        "Token Type": k,
+                        "Count": v,
+                        "Percentage": f"{100*v/max(sum(stats.values()),1):.1f}%"
+                    }
+                    for k, v in sorted(stats.items(), key=lambda x: -x[1])
+                ])
+
+                st.dataframe(
+                    df_stats,
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+                st.bar_chart(pd.Series(stats))
 
 # ═══════════════════════════════════════════════
 # PAGE 2: TOC AUTOMATA SIMULATOR
@@ -478,7 +608,7 @@ def page_automata():
 
         with d1:
             st.markdown("#### 📋 DFA Transition Trace")
-            st.markdown('<div class="toc-card">', unsafe_allow_html=True)
+            #st.markdown('<div class="toc-card">', unsafe_allow_html=True)
 
             # Execution trace text
             trace_html = '<div style="font-family:Share Tech Mono,monospace;font-size:12px;line-height:2;">'
@@ -542,7 +672,7 @@ def page_automata():
             st.markdown(f'<div style="line-height:2.5;">{path_html}</div>', unsafe_allow_html=True)
 
         # All tokens DFA summary
-        st.markdown("<br>")
+        #st.markdown("<br>")
         st.markdown("#### 📋 All Tokens — DFA Summary")
         all_rows = []
         for dr_ in r.dfa_results:
@@ -581,7 +711,7 @@ def page_automata():
         else:
             st.markdown('<div class="verdict-reject" style="margin-top:12px;">❌ PDA REJECTED — Bracket imbalance detected</div>', unsafe_allow_html=True)
 
-        st.markdown("<br>")
+        #st.markdown("<br>")
         p1, p2, p3 = st.columns([3, 2, 2], gap="large")
 
         with p1:
@@ -637,7 +767,7 @@ def page_automata():
                 </div>
                 """, unsafe_allow_html=True)
 
-            st.markdown("<br>")
+            #st.markdown("<br>")
             st.markdown("#### 📊 PDA Transition Table")
             pda_tbl = []
             for t in pda.transitions:
@@ -955,7 +1085,7 @@ def page_dashboard():
                 unsafe_allow_html=True
             )
 
-    st.markdown("<br>")
+    #st.markdown("<br>")
 
     # ── Charts ─────────────────────────────────────────
     c1, c2, c3 = st.columns(3, gap="large")
@@ -986,7 +1116,7 @@ def page_dashboard():
             df_depth = pd.DataFrame({"Stack Depth": depths})
             st.line_chart(df_depth)
 
-    st.markdown("<br>")
+    #st.markdown("<br>")
     c4, c5 = st.columns(2, gap="large")
 
     with c4:
@@ -996,7 +1126,7 @@ def page_dashboard():
         df_acc = pd.DataFrame({"Status": ["Accepted", "Rejected"], "Count": [accepted, rejected]})
         st.dataframe(df_acc, hide_index=True, use_container_width=True)
 
-        st.markdown("<br>")
+        #st.markdown("<br>")
         st.markdown("#### Automata Complexity Summary")
         complexity = pd.DataFrame([
             {"Metric": "Unique DFA States Visited",     "Value": r.total_dfa_states},
