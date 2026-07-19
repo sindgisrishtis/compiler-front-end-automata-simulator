@@ -43,7 +43,6 @@ An interactive **Compiler Front-End Simulation System** that demonstrates how **
 
 - [Overview](#-overview)
 - [Features](#-features)
-- [Demo](#-demo)
 - [Screenshots](#-screenshots)
 - [System Architecture](#-system-architecture)
 - [Compiler Workflow](#-compiler-workflow)
@@ -136,22 +135,6 @@ Instead of simply explaining automata theory, the project demonstrates how these
 - Streamlit Cloud deployment
 - Cross-platform compatibility
 - Easy local setup
-
----
-
-# 🎥 Demo
-
-> **Demo GIF will be added here.**
-
-The demonstration showcases the complete compiler front-end pipeline:
-
-- Source code input
-- Lexical analysis
-- Token generation
-- DFA visualization
-- PDA stack simulation
-- Syntax validation
-- Compiler output
 
 ---
 
