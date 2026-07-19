@@ -31,8 +31,6 @@ An interactive **Compiler Front-End Simulation System** that demonstrates how **
 
 ---
 
-Live Demo
-
 # 🌐 Live Demo
 
 ### 🚀 Try the application here
