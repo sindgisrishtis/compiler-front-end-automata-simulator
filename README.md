@@ -19,6 +19,20 @@ An interactive **Compiler Front-End Simulation System** that demonstrates how **
 
 ---
 
+## ✨ Key Highlights
+
+- Interactive Compiler Front-End Simulator
+- DFA-Based Lexical Analysis
+- PDA-Based Syntax Validation
+- Compiler Workflow Visualization
+- Graphviz-Based Automata Diagrams
+- Dockerized Deployment
+- Live Streamlit Cloud Demo
+
+---
+
+Live Demo
+
 # 🌐 Live Demo
 
 ### 🚀 Try the application here
@@ -354,6 +368,27 @@ Demonstrates the practical application of TOC concepts in lexical analysis and s
 - Return statements
 - Nested code blocks
 - Compiler syntax checking
+
+---
+
+# 🧠 Skills Demonstrated
+
+- Compiler Design
+- Theory of Computation
+- Lexical Analysis
+- Syntax Analysis
+- Deterministic Finite Automata (DFA)
+- Pushdown Automata (PDA)
+- Context-Free Grammars (CFG)
+- Regular Expressions
+- Python Development
+- Streamlit
+- Graphviz
+- Docker
+- Git & GitHub
+
+---
+
 # 📁 Project Structure
 
 ```
@@ -396,6 +431,18 @@ compiler-front-end-automata-simulator/
 | **assets/** | Project screenshots and visual resources |
 | **Dockerfile** | Docker configuration for containerized deployment |
 | **requirements.txt** | Python package dependencies |
+
+---
+
+# 🏗 Software Design
+
+The project follows a modular architecture where each component has a single responsibility.
+
+- Separation of Concerns
+- Modular Python Design
+- Reusable Compiler Components
+- Easy-to-Extend Architecture
+- Maintainable Code Organization
 
 ---
 
@@ -622,6 +669,8 @@ The deployment automatically updates whenever new changes are pushed to the GitH
 
 This project strengthened both theoretical understanding and practical implementation of compiler front-end systems and formal language concepts.
 
+---
+
 ## Compiler Design
 
 - Implemented lexical analysis using DFA-inspired state transitions.
@@ -670,6 +719,16 @@ The current project focuses on compiler front-end simulation. Future versions ca
 - Additional programming language constructs
 - Dark/Light theme support
 - Animated compiler execution timeline
+
+---
+
+# ⚡ Performance Characteristics
+
+- Lightweight Python implementation
+- Fast lexical tokenization for educational programs
+- Modular parser and lexer design
+- Dockerized for consistent execution across environments
+- Browser-based interactive visualization with Streamlit
 
 ---
 
